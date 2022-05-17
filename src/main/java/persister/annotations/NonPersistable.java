@@ -10,6 +10,6 @@ import java.lang.annotation.Target;
 @Retention(RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
-public @interface NotPersistable {
+public @interface NonPersistable {
 
 }

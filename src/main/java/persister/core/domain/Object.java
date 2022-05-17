@@ -1,4 +1,4 @@
-package persister.core.domain.object;
+package persister.core.domain;
 
 public class Object {
     private final int id;
