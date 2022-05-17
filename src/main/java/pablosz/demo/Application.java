@@ -24,20 +24,7 @@ public class Application implements CommandLineRunner
 	@Override
 	public void run(String... args) throws Exception
 	{
-		String hql="";
-		hql+="SELECT p.email ";
-		hql+="FROM Perfil p ";
-		hql+="WHERE p.nombre =:x ";
-		
-		Query q = em.createQuery(hql);
-		q.setParameter("x","Pablo");
-		
-		List<String> lst = q.getResultList();
-		
-		for(String e:lst)
-		{
-			System.out.println(e);
-		}
+
 		
 		
 	}

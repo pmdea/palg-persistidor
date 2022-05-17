@@ -1,6 +1,6 @@
-package persistidor;
+package persistor;
 
-import persistidor.exception.StructureChangedException;
+import persistor.exception.StructureChangedException;
 
 public class PersistentObject implements IPersistentObject{
 
