@@ -1,15 +1,15 @@
 package persister.annotations;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import static java.lang.annotation.ElementType.FIELD;
 
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 @Retention(RUNTIME)
-@Target(ElementType.TYPE)
+@Target(FIELD)
 @Inherited
-public @interface NonPersistable {
+public @interface NotPersistable {
 
 }
