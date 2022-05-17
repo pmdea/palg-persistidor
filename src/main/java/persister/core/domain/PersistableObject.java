@@ -1,12 +1,12 @@
 package persister.core.domain;
 
-public class Object {
+public class PersistableObject {
     private final int id;
 
     private final int clazzId;
     private final int sessionId;
 
-    public Object(int id, int clazzId, int sessionId) {
+    public PersistableObject(int id, int clazzId, int sessionId) {
         this.id = id;
         this.clazzId = clazzId;
         this.sessionId = sessionId;
