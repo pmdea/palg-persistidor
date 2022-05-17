@@ -1,4 +1,4 @@
-package persistor.annotations;
+package persister.annotations;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 

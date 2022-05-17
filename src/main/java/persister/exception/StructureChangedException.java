@@ -1,4 +1,4 @@
-package persistor.exception;
+package persister.exception;
 
 public class StructureChangedException extends Exception {
 

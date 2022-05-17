@@ -1,4 +1,4 @@
-package persistor.core.domain.clazz;
+package persister.core.domain.clazz;
 
 public class Clazz {
     private final int id;

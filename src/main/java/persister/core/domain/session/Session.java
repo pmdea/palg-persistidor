@@ -1,4 +1,4 @@
-package persistor.core.domain.session;
+package persister.core.domain.session;
 
 public class Session {
     private final int id;

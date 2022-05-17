@@ -1,6 +1,6 @@
-package persistor;
+package persister;
 
-import persistor.exception.StructureChangedException;
+import persister.exception.StructureChangedException;
 
 public interface IPersistentObject {
 	

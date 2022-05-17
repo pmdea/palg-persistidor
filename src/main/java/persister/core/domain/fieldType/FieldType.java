@@ -1,4 +1,4 @@
-package persistor.core.domain.fieldType;
+package persister.core.domain.fieldType;
 
 public class FieldType {
     private final int id;

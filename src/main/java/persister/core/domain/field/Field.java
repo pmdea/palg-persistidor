@@ -1,4 +1,4 @@
-package persistor.core.domain.field;
+package persister.core.domain.field;
 
 public class Field {
     private final int id;

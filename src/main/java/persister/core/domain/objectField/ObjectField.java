@@ -1,4 +1,4 @@
-package persistor.core.domain.objectField;
+package persister.core.domain.objectField;
 
 public class ObjectField {
     private final int id;
