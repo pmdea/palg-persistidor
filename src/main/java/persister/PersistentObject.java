@@ -17,6 +17,7 @@ public class PersistentObject implements IPersistentObject{
 		* 4. Es una clase nueva? (no existe ID. Si no existe la clase, entonces el objeto tampoco)
 		* 	4-1-a. Obtener Clazz de "o"
 		* 	4-1-b. Storear la clase y obtener ID
+		*  Preguntar al profe. Si existe clase hay que validarla como con load? Sino va a haber dos clases distintas en la base con mismo nombre
 		* 5. Obtener PersistentObject de "o"
 		* 6. Obtener objeto para esa clase y esa sesion
 		* 7. Existe objeto?

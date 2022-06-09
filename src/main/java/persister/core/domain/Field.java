@@ -3,14 +3,12 @@ package persister.core.domain;
 public class Field {
     private final int id;
     private final String name;
-    private final int typeId;
-    private final int clazzId;
+    private final FieldType type;
 
-    public Field(int id, String name, int typeId, int clazzId) {
+    public Field(int id, String name, FieldType type) {
         this.id = id;
         this.name = name;
-        this.typeId = typeId;
-        this.clazzId = clazzId;
+        this.type = type;
     }
 
     public int getId() {
@@ -21,11 +19,7 @@ public class Field {
         return name;
     }
 
-    public int getTypeId() {
-        return typeId;
-    }
-
-    public int getClazzId() {
-        return clazzId;
+    public FieldType getType() {
+        return type;
     }
 }
