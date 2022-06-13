@@ -2,15 +2,13 @@ package persister.core.domain;
 
 public class ObjectField {
     private final int id;
-    private final int objectId;
     private final int fieldId;
     private final int nestedObjectFieldId;
     private final int valueObjectId;
     private final String value;
 
-    public ObjectField(int id, int objectId, int fieldId, int nestedObjectFieldId, int valueObjectId, String value) {
+    public ObjectField(int id, int fieldId, int nestedObjectFieldId, int valueObjectId, String value) {
         this.id = id;
-        this.objectId = objectId;
         this.fieldId = fieldId;
         this.nestedObjectFieldId = nestedObjectFieldId;
         this.valueObjectId = valueObjectId;
@@ -19,10 +17,6 @@ public class ObjectField {
 
     public int getId() {
         return id;
-    }
-
-    public int getObjectId() {
-        return objectId;
     }
 
     public int getFieldId() {

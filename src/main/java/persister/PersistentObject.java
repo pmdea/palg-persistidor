@@ -18,7 +18,10 @@ public class PersistentObject implements IPersistentObject{
 		* 	4-1-a. Obtener Clazz de "o"
 		* 	4-1-b. Storear la clase y obtener ID
 		*  Preguntar al profe. Si existe clase hay que validarla como con load? Sino va a haber dos clases distintas en la base con mismo nombre
-		* 5. Obtener PersistentObject de "o"
+		* 		Dijo "actualizar clase, borrar todas las instancias y volverlas a guardar"
+		* 		Con volverlas a guardar no se si se refiere a tener que volverlas a cargar por parte del usuario
+		* 		o tenemos que "actualizarlas" nosotros, en este ultimo caso, que hacemos con las diferencias?
+		* 5. Obtener PersistentObject de "o" <- la clase pasada ya tiene que estar validada y con los ids correspondientes
 		* 6. Obtener objeto para esa clase y esa sesion
 		* 7. Existe objeto?
 		* 	7-1-a. Hacer update de ese objectId usando PersistentObject obtenido en 4
