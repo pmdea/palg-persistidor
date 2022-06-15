@@ -1,31 +1,65 @@
 package persister.core.domain;
 
-public class Field {
-    private final int id;
-    private final String name;
-    private final int typeId;
-    private final int clazzId;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
-    public Field(int id, String name, int typeId, int clazzId) {
+@Entity
+@Table(name="FIELD")
+public class Field {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    private String name;
+    @OneToOne
+    private FieldType typeId;
+    @ManyToOne
+    @JoinColumn(name="cart_id", nullable=false)
+    private Clazz clazzId;
+
+    public Field(int id, String name, FieldType typeId, Clazz clazzId) {
         this.id = id;
         this.name = name;
         this.typeId = typeId;
         this.clazzId = clazzId;
     }
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public int getTypeId() {
-        return typeId;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public int getClazzId() {
-        return clazzId;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public FieldType getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(FieldType typeId) {
+		this.typeId = typeId;
+	}
+
+	public Clazz getClazzId() {
+		return clazzId;
+	}
+
+	public void setClazzId(Clazz clazzId) {
+		this.clazzId = clazzId;
+	}
+    
+    
 }

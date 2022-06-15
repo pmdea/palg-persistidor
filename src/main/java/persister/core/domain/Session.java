@@ -1,20 +1,32 @@
 package persister.core.domain;
 
-public class Session {
-    private final int id;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-    private final long timestamp;
+@Entity
+@Table(name = "sesion")
+public class Session {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+
+    private long last_access;
 
     public Session(int id, long timestamp) {
         this.id = id;
-        this.timestamp = timestamp;
+        this.last_access = timestamp;
     }
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public long getTimestamp() {
-        return timestamp;
-    }
+	public long getLast_access() {
+		return last_access;
+	}
+    
+    
 }

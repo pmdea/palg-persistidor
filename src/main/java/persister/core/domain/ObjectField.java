@@ -1,12 +1,20 @@
 package persister.core.domain;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+
+@Entity
 public class ObjectField {
-    private final int id;
-    private final int objectId;
-    private final int fieldId;
-    private final int nestedObjectFieldId;
-    private final int valueObjectId;
-    private final String value;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+    private int objectId;
+    private int fieldId;
+    private int nestedObjectFieldId;
+    private int valueObjectId;
+    private String value;
 
     public ObjectField(int id, int objectId, int fieldId, int nestedObjectFieldId, int valueObjectId, String value) {
         this.id = id;

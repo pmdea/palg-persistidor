@@ -1,10 +1,18 @@
 package persister.core.domain;
 
-public class PersistableObject {
-    private final int id;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-    private final int clazzId;
-    private final int sessionId;
+@Entity
+public class PersistableObject {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+    private int id;
+
+    private int clazzId;
+    private int sessionId;
 
     public PersistableObject(int id, int clazzId, int sessionId) {
         this.id = id;
