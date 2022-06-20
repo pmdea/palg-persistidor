@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diagram version="1" name="der.erd">
+	<entities>
+		<data-source id="hsqldb_server-1816805615f-72040eb6865d4109">
+			<entity id="1" name="CLAZZ" fq-name="PUBLIC.PUBLIC.CLAZZ" order="0" x="417" y="128">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="2" name="DEPT" fq-name="PUBLIC.PUBLIC.DEPT" order="1" x="570" y="332">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="3" name="EMP" fq-name="PUBLIC.PUBLIC.EMP" order="2" x="570" y="489">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="4" name="FIELD" fq-name="PUBLIC.PUBLIC.FIELD" order="3" x="233" y="191">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="5" name="FIELDTYPE" fq-name="PUBLIC.PUBLIC.FIELDTYPE" order="4" x="417" y="235">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="6" name="OBJECTFIELD" fq-name="PUBLIC.PUBLIC.OBJECTFIELD" order="5" x="20" y="20">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="7" name="PERSISTABLEOBJECT" fq-name="PUBLIC.PUBLIC.PERSISTABLEOBJECT" order="6" x="232" y="18">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="8" name="SESION" fq-name="PUBLIC.PUBLIC.SESION" order="7" x="417" y="21">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="9" name="X_ALUMNO" fq-name="PUBLIC.PUBLIC.X_ALUMNO" order="8" x="701" y="332">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="10" name="X_ALUMNO_CARRERA" fq-name="PUBLIC.PUBLIC.X_ALUMNO_CARRERA" order="9" x="871" y="332">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="11" name="X_ALUMNO_CURSO" fq-name="PUBLIC.PUBLIC.X_ALUMNO_CURSO" order="10" x="20" y="342">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="12" name="X_CARRERA" fq-name="PUBLIC.PUBLIC.X_CARRERA" order="11" x="229" y="342">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="13" name="X_CARRERA_MATERIA" fq-name="PUBLIC.PUBLIC.X_CARRERA_MATERIA" order="12" x="1065" y="332">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="14" name="X_CURSO" fq-name="PUBLIC.PUBLIC.X_CURSO" order="13" x="701" y="459">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="15" name="X_DIA_SEMANA" fq-name="PUBLIC.PUBLIC.X_DIA_SEMANA" order="14" x="20" y="499">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="16" name="X_DOCENTE" fq-name="PUBLIC.PUBLIC.X_DOCENTE" order="15" x="229" y="499">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="17" name="X_MATERIA" fq-name="PUBLIC.PUBLIC.X_MATERIA" order="16" x="417" y="499">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+			<entity id="18" name="X_TURNO" fq-name="PUBLIC.PUBLIC.X_TURNO" order="17" x="417" y="342">
+				<path name="PUBLIC"/>
+				<path name="PUBLIC"/>
+			</entity>
+		</data-source>
+	</entities>
+	<relations>
+		<relation name="SYS_FK_10217" fq-name="PUBLIC.PUBLIC.FIELD.SYS_FK_10217" type="fk" pk-ref="1" fk-ref="4"/>
+		<relation name="SYS_FK_10247" fq-name="PUBLIC.PUBLIC.PERSISTABLEOBJECT.SYS_FK_10247" type="fk" pk-ref="1" fk-ref="7"/>
+		<relation name="SYS_FK_10232" fq-name="PUBLIC.PUBLIC.OBJECTFIELD.SYS_FK_10232" type="fk" pk-ref="4" fk-ref="6"/>
+		<relation name="SYS_FK_10222" fq-name="PUBLIC.PUBLIC.FIELD.SYS_FK_10222" type="fk" pk-ref="5" fk-ref="4"/>
+		<relation name="SYS_FK_10242" fq-name="PUBLIC.PUBLIC.OBJECTFIELD.SYS_FK_10242" type="fk" pk-ref="6" fk-ref="6">
+			<bend type="rel" x="230" y="176"/>
+			<bend type="rel" x="104" y="215"/>
+		</relation>
+		<relation name="SYS_FK_10227" fq-name="PUBLIC.PUBLIC.OBJECTFIELD.SYS_FK_10227" type="fk" pk-ref="7" fk-ref="6"/>
+		<relation name="SYS_FK_10237" fq-name="PUBLIC.PUBLIC.OBJECTFIELD.SYS_FK_10237" type="fk" pk-ref="7" fk-ref="6"/>
+		<relation name="SYS_FK_10252" fq-name="PUBLIC.PUBLIC.PERSISTABLEOBJECT.SYS_FK_10252" type="fk" pk-ref="8" fk-ref="7"/>
+	</relations>
+</diagram>

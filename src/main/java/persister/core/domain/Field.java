@@ -1,5 +1,6 @@
 package persister.core.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,18 +17,15 @@ public class Field {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "typeId", referencedColumnName = "id")
     private FieldType typeId;
+    
     @ManyToOne
-    @JoinColumn(name="cart_id", nullable=false)
+    @JoinColumn(name = "clazzId", referencedColumnName = "id")
     private Clazz clazzId;
-
-    public Field(int id, String name, FieldType typeId, Clazz clazzId) {
-        this.id = id;
-        this.name = name;
-        this.typeId = typeId;
-        this.clazzId = clazzId;
-    }
+    
+    public Field() {}
 
 	public int getId() {
 		return id;
@@ -60,6 +58,12 @@ public class Field {
 	public void setClazzId(Clazz clazzId) {
 		this.clazzId = clazzId;
 	}
-    
-    
+
+	public Field(int id, String name, FieldType typeId, Clazz clazzId) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.typeId = typeId;
+		this.clazzId = clazzId;
+	}
 }
