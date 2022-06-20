@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class ObjectParser {
     public PersistableObject toPersistable(Object object, Clazz clazz, Session session) {
         //todo: armar fields en base a los fields de clazz
-        return new PersistableObject(0,clazz.getId(), session.getId(), new ArrayList<>());
+        return null;//new PersistableObject(0,clazz.getId(), session.getId(), new ArrayList<>());
     }
 
     public Object toObject(PersistableObject persistableObject) {

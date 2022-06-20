@@ -4,6 +4,8 @@ import persister.exception.StructureChangedException;
 
 public class PersistentObject implements IPersistentObject{
 
+	private ObjectParser objectParser = new ObjectParser();
+	
 	@Override
 	public boolean store(long sId, Object o) {
 		// TODO Auto-generated method stub

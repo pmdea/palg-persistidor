@@ -21,15 +21,15 @@ public class ClazzParser {
         Annotation persistable = clazz.getAnnotation(Persistable.class);
         java.lang.reflect.Field[] declaredFields = clazz.getDeclaredFields();
 
-        List<Field> fields = Arrays.stream(declaredFields).map(field -> {
-            Annotation persistableField = field.getAnnotation(Persistable.class);
-            Annotation notPersistableField = field.getAnnotation(NotPersistable.class);
-            boolean persistField = (persistable != null || persistableField != null) && notPersistableField == null;
-            if (!persistField) return null;
-            return new Field(0, field.getName(), new FieldType(0, field.getType().getName()));
-        }).filter(Objects::nonNull).collect(Collectors.toList());
+//        List<Field> fields = Arrays.stream(declaredFields).map(field -> {
+//            Annotation persistableField = field.getAnnotation(Persistable.class);
+//            Annotation notPersistableField = field.getAnnotation(NotPersistable.class);
+//            boolean persistField = (persistable != null || persistableField != null) && notPersistableField == null;
+//            if (!persistField) return null;
+//            return new Field(0, field.getName(), new FieldType(0, field.getType().getName())); //Lo dejo mal porque cambiaron los entities
+//        }).filter(Objects::nonNull).collect(Collectors.toList());
 
-        return new Clazz(0, name, fields);
+        return new Clazz(0, name, null);
     }
 
     public String getName(Object object) {
