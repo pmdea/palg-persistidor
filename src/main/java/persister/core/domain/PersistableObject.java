@@ -22,7 +22,7 @@ public class PersistableObject {
 	@OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "clazzId", referencedColumnName = "id")
     private Clazz clazzId;
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "sessionId", referencedColumnName = "id")
     private Session sessionId;
 	@OneToMany(mappedBy = "objectId", cascade = CascadeType.ALL)

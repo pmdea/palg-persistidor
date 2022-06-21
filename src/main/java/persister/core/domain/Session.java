@@ -1,12 +1,13 @@
 package persister.core.domain;
 
+import java.util.List;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -17,8 +18,8 @@ public class Session {
     private int id;
     private long last_access;
     
-    @OneToOne(mappedBy = "sessionId", cascade = CascadeType.ALL)
-    private PersistableObject persistableObject;
+    @OneToMany(mappedBy = "sessionId", cascade = CascadeType.ALL)
+    private List<PersistableObject> persistableObjectList;
 
     public Session() {}
 
@@ -28,12 +29,12 @@ public class Session {
 		this.last_access = last_access;
 	}
 	
-	public PersistableObject getPersistableObject() {
-		return persistableObject;
+	public List<PersistableObject> getPersistableObject() {
+		return persistableObjectList;
 	}
 
-	public void setPersistableObject(PersistableObject persistableObject) {
-		this.persistableObject = persistableObject;
+	public void setPersistableObject(List<PersistableObject> persistableObject) {
+		this.persistableObjectList = persistableObject;
 	}
 
 	public int getId() {
