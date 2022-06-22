@@ -34,7 +34,7 @@ public class Clazz {
 	
 	public void setFieldsParents(List<Field> fields) {
 		for(Field f: fields) {
-			f.setClazzId(this);
+			f.setClazz(this);
 		}
 		this.fields = fields;
 	}

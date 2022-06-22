@@ -19,11 +19,11 @@ public class Field {
     private String name;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "typeId", referencedColumnName = "id")
-    private FieldType typeId;
+    private FieldType type;
     
     @ManyToOne
     @JoinColumn(name = "clazzId", referencedColumnName = "id")
-    private Clazz clazzId;
+    private Clazz clazz;
     
     public Field() {}
 
@@ -43,27 +43,27 @@ public class Field {
 		this.name = name;
 	}
 
-	public FieldType getTypeId() {
-		return typeId;
+	public FieldType getType() {
+		return type;
 	}
 
-	public void setTypeId(FieldType typeId) {
-		this.typeId = typeId;
+	public void setType(FieldType type) {
+		this.type = type;
 	}
 
-	public Clazz getClazzId() {
-		return clazzId;
+	public Clazz getClazz() {
+		return clazz;
 	}
 
-	public void setClazzId(Clazz clazzId) {
-		this.clazzId = clazzId;
+	public void setClazz(Clazz clazz) {
+		this.clazz = clazz;
 	}
 
-	public Field(int id, String name, FieldType typeId, Clazz clazzId) {
+	public Field(int id, String name, FieldType type, Clazz clazz) {
 		super();
 		this.id = id;
 		this.name = name;
-		this.typeId = typeId;
-		this.clazzId = clazzId;
+		this.type = type;
+		this.clazz = clazz;
 	}
 }
