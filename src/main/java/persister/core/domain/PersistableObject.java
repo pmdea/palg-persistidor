@@ -10,7 +10,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -19,7 +18,7 @@ public class PersistableObject {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "clazzId", referencedColumnName = "id")
     private Clazz clazzId;
 	@ManyToOne(cascade = CascadeType.ALL)
