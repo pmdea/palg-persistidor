@@ -23,7 +23,7 @@ public class Field {
     
     @ManyToOne
     @JoinColumn(name = "clazzId", referencedColumnName = "id")
-    private Clazz clazz;
+    private Clazz clazzId;
     
     public Field() {}
 
@@ -52,11 +52,11 @@ public class Field {
 	}
 
 	public Clazz getClazz() {
-		return clazz;
+		return clazzId;
 	}
 
 	public void setClazz(Clazz clazz) {
-		this.clazz = clazz;
+		this.clazzId = clazz;
 	}
 
 	public Field(int id, String name, FieldType type, Clazz clazz) {
@@ -64,6 +64,6 @@ public class Field {
 		this.id = id;
 		this.name = name;
 		this.type = type;
-		this.clazz = clazz;
+		this.clazzId = clazz;
 	}
 }

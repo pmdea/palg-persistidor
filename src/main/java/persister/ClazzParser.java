@@ -37,7 +37,7 @@ public class ClazzParser {
 
         Clazz c = new Clazz();
         c.setName(getClassName(clazz));
-        c.setFields(fields);
+        c.setFieldsParents(fields);
         return c;
     }
 

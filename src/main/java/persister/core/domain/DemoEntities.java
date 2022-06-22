@@ -69,8 +69,7 @@ public class DemoEntities {
 
 			Clazz clazz = getClazz(clazzRepo, objTest);
 
-
-			return "Estamos validando clases";
+			return clazz.getId();
 		}
 
 		private Clazz getClazz(ClazzRepository clazzRepo, Object obj) throws StructureChangedException {
