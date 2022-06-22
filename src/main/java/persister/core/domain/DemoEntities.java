@@ -67,10 +67,23 @@ public class DemoEntities {
 			objTest.setDni(123123123);
 			objTest.setNombre("test");
 
-			boolean existsOther = CompareClass.existsDifferentInDB(clazzRepo, ClazzParser.toClazzFromObject(objTest));
-			if (existsOther)
-				throw new StructureChangedException(PersonaTest.class.getName() + " is different from the one in DB");
+			Clazz clazz = getClazz(clazzRepo, objTest);
+
+
 			return "Estamos validando clases";
+		}
+
+		private Clazz getClazz(ClazzRepository clazzRepo, Object obj) throws StructureChangedException {
+			Clazz clazz = ClazzParser.toClazzFromObject(obj);
+			int exists = CompareClass.existsInDB(clazzRepo, ClazzParser.toClazzFromObject(obj));
+			if (exists == 0) {
+				return clazzRepo.save(clazz);
+			} else if (exists == 1) {
+				String className = clazz.getName();
+				return clazzRepo.findByName(className);
+			} else {
+				throw new StructureChangedException(PersonaTest.class.getName() + " is different from the one in DB");
+			}
 		}
 		
 		@RequestMapping("/test")
