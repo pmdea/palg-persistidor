@@ -1,10 +1,37 @@
 package persister;
 
+import java.lang.reflect.Field;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import persister.core.domain.Clazz;
+import persister.core.domain.ObjectField;
+import persister.core.domain.PersistableObject;
+import persister.core.domain.Session;
+import persister.core.repository.ClazzRepository;
+import persister.core.repository.SessionRepository;
 import persister.exception.StructureChangedException;
 
+@Service
 public class PersistentObject implements IPersistentObject{
 
 	private ObjectParser objectParser = new ObjectParser();
+	
+	@Autowired
+	SessionRepository sessionRepo;
+	
+	@Autowired
+	ClazzRepository clazzRepo;
+	
+	private Predicate<PersistableObject> isOfClass(String clazzName){
+		return obj -> obj.getClazzId().getName().equalsIgnoreCase(clazzName);
+	}
 	
 	@Override
 	public boolean store(long sId, Object o) {
@@ -51,32 +78,81 @@ public class PersistentObject implements IPersistentObject{
 			else
 				2-2-a. Objeto no encontrado
 		 */
+		String className = clazz.getName();
+		Optional<Session> sessionOpt = sessionRepo.findById(sId);
+		if(sessionOpt.isPresent()) {
+			//Obtengo la sesion
+			Session session = sessionOpt.get();
+			List<PersistableObject> objectsFromSession = findObjectByClassName(session.getPersistableObject(), className); //Verifico que tenga un objeto con la class
+			if(objectsFromSession.isEmpty())
+				return null; //no tiene objeto, return null
+			PersistableObject obj = objectsFromSession.get(0);
+			if(hasStructureChanged(clazz, obj.getClazzId()))
+				throw new StructureChangedException("Structure of class " + clazz.getName() + "has changed.");
+			T object = rebuildObject(clazz, obj);
+			session.setLast_access(Instant.now().getEpochSecond());
+			return object;
+		}
+		
+		
 		return null;
+	}
+	
+	private <T> T rebuildObject(Class<T> c, PersistableObject obj) {
+		T recon = null;
+		try {
+			recon = c.newInstance();
+			for(Field f : c.getDeclaredFields()) {
+				f.setAccessible(true);
+				ObjectField objField = obj.getObjectFields().stream().filter(field -> field.getFieldId().getName().equals(f.getName())).collect(Collectors.toList()).get(0);
+				
+			}
+			
+		} catch (InstantiationException e) {} catch (IllegalAccessException e) {}
+		
+		return recon;
+	}
+	
+	private boolean hasStructureChanged(Class classJ, Clazz classDb) {
+		
+		return false;
+	}
+	
+	private boolean isPrimitive(Object obj) {
+		return obj.getClass().isPrimitive()
+				|| obj instanceof String
+                || obj instanceof Integer
+                || obj instanceof Double
+                || obj instanceof Boolean;
 	}
 
 	@Override
 	public <T> boolean exists(long sId, Class<T> clazz) {
-		// TODO Auto-generated method stub
-		/*
-			1. Obtengo nombre de clase
-			2. No existe clase?
-				2.1.a. Retorno false
-			3. Busco objeto por classId y sessionId, retorno existencia
-		 */
+		
+		Optional<Session> session = sessionRepo.findById(sId);
+		if(session.isPresent()) {
+			Session actual = session.get();
+			actual.setLast_access(Instant.now().getEpochSecond());
+			return !findObjectByClassName(actual
+					.getPersistableObject(), clazz.getName())
+					.isEmpty();
+		}
+		
 		return false;
+	}
+	
+	private List<PersistableObject> findObjectByClassName(List<PersistableObject> persistableList, String className){
+		return persistableList.stream()
+				.filter(isOfClass(className))
+				.collect(Collectors.toList());
 	}
 
 	@Override
 	public long elapsedTime(long sId) {
-		// TODO Auto-generated method stub
-		/*
-			1. Busco session
-			2. Existe?
-				Retorno elapsedTime
-			else
-				Error? Retorna 0? <-- Ver que hacer
-		 */
-		return 0;
+		Optional<Session> session = sessionRepo.findById(sId);
+		if(session.isPresent())
+			return Instant.now().getEpochSecond() - session.get().getLast_access();
+		return -1; //Si no existe la sesion
 	}
 
 	@Override
@@ -88,7 +164,19 @@ public class PersistentObject implements IPersistentObject{
 			Se puede hacer una funcion auxiliar que devuelva el objeto ya parseado y el classId, para reutilizar logica entre delete y store.
 			Tambien puede tener un booleano si busca eliminar o leer
 		 */
-		return null;
+		T deletedObject = null;
+		try {
+			deletedObject = load(sId, clazz);
+			if(sessionRepo.findById(sId).isPresent()) {
+				Session session = sessionRepo.findById(sId).get();
+				session.getPersistableObject().removeIf(isOfClass(clazz.getName()));
+				session.setLast_access(Instant.now().getEpochSecond());
+				sessionRepo.save(session);
+			}
+			return deletedObject;
+			 
+		} catch (StructureChangedException e) { }
+		return deletedObject;
 	}
 
 }

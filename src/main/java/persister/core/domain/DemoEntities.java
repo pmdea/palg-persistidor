@@ -101,8 +101,9 @@ public class DemoEntities {
 				objectFields.add(oField);
 			}
 			pObject.setObjectFieldsParents(objectFields);
-			
-			session.setPersistableObject(pObject);
+			List<PersistableObject> pObjList = new ArrayList<PersistableObject>();
+			pObjList.add(pObject);
+			session.setPersistableObject(pObjList);
 			session.setLast_access(Instant.now().getEpochSecond()); //Timestamp como long en segundos
 			sessionRepository.save(session);
 			return session;

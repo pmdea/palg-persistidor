@@ -19,7 +19,7 @@ public class PersistableObject {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-	@OneToOne(cascade = CascadeType.ALL)
+	@ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "clazzId", referencedColumnName = "id")
     private Clazz clazzId;
 	@ManyToOne(cascade = CascadeType.ALL)
