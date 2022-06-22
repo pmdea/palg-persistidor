@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import org.aspectj.apache.bcel.classfile.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +21,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import persister.ClazzParser;
+import persister.CompareClass;
 import persister.PersonaTest;
 import persister.core.repository.ClazzRepository;
 import persister.core.repository.FieldRepository;
@@ -27,6 +30,7 @@ import persister.core.repository.FieldTypeRepository;
 import persister.core.repository.ObjectFieldRepository;
 import persister.core.repository.PersistableObjectRepository;
 import persister.core.repository.SessionRepository;
+import persister.exception.StructureChangedException;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"persister.core.*"})
@@ -56,7 +60,18 @@ public class DemoEntities {
 		private PersistableObjectRepository persistableObjectRepo;
 		@Autowired
 		private SessionRepository sessionRepository;
-		
+
+		@RequestMapping("/test2")
+		public Object generarTest2() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException, StructureChangedException {
+			PersonaTest objTest = new PersonaTest();
+			objTest.setDni(123123123);
+			objTest.setNombre("test");
+
+			boolean existsOther = CompareClass.existsDifferentInDB(clazzRepo, ClazzParser.toClazzFromObject(objTest));
+			if (existsOther)
+				throw new StructureChangedException(PersonaTest.class.getName() + " is different from the one in DB");
+			return "Estamos validando clases";
+		}
 		
 		@RequestMapping("/test")
 		public Object generarTest() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException
@@ -75,7 +90,7 @@ public class DemoEntities {
 				f.setName(field.getName());
 				FieldType fType = new FieldType();
 				fType.setName(field.getType().getName());
-				f.setTypeId(fType);
+				f.setType(fType);
 				fieldsPersonaTest.add(f);
 			}
 			
@@ -101,9 +116,10 @@ public class DemoEntities {
 				objectFields.add(oField);
 			}
 			pObject.setObjectFieldsParents(objectFields);
-			List<PersistableObject> pObjList = new ArrayList<PersistableObject>();
-			pObjList.add(pObject);
-			session.setPersistableObject(pObjList);
+
+			ArrayList<PersistableObject> objects = new ArrayList<>();
+			objects.add(pObject);
+			session.setPersistableObject(objects);
 			session.setLast_access(Instant.now().getEpochSecond()); //Timestamp como long en segundos
 			sessionRepository.save(session);
 			return session;
