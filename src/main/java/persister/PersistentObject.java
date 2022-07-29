@@ -2,64 +2,100 @@ package persister;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import persister.core.domain.Clazz;
 import persister.core.domain.ObjectField;
 import persister.core.domain.PersistableObject;
 import persister.core.domain.Session;
-import persister.core.repository.ClazzRepository;
-import persister.core.repository.SessionRepository;
+import persister.core.repository.*;
 import persister.exception.StructureChangedException;
 
 @Service
 public class PersistentObject implements IPersistentObject{
 
-	private ObjectParser objectParser = new ObjectParser();
-	
-	@Autowired
-	SessionRepository sessionRepo;
-	
-	@Autowired
-	ClazzRepository clazzRepo;
-	
+	private SessionRepository sessionRepo;
+	private ClazzRepository clazzRepo;
+	private PersistableObjectRepository persistableObjectRepo;
+	private FieldTypeRepository fieldTypeRepo;
+	private ObjectFieldRepository objectFieldRepo;
+
+	public PersistentObject(SessionRepository sessionRepo, ClazzRepository clazzRepo, PersistableObjectRepository persistableObjectRepo, FieldTypeRepository fieldTypeRepo, ObjectFieldRepository objectFieldRepo) {
+		this.sessionRepo = sessionRepo;
+		this.clazzRepo = clazzRepo;
+		this.persistableObjectRepo = persistableObjectRepo;
+		this.fieldTypeRepo = fieldTypeRepo;
+		this.objectFieldRepo = objectFieldRepo;
+	}
+
 	private Predicate<PersistableObject> isOfClass(String clazzName){
 		return obj -> obj.getClazzId().getName().equalsIgnoreCase(clazzName);
 	}
 	
 	@Override
 	public boolean store(long sId, Object o) {
-		// TODO Auto-generated method stub
-		/*
-		* 1. Existe sesion?
-		* 	1-1-a. Actualizo timestamp
-		* else
-		* 	1-2-a. La creo con nuevo timestamp
-		* 2. Obtener nombre de la clase de "o"
-		* 3. Obtener ID de la clase
-		* 4. Es una clase nueva? (no existe ID. Si no existe la clase, entonces el objeto tampoco)
-		* 	4-1-a. Obtener Clazz de "o"
-		* 	4-1-b. Storear la clase y obtener ID
-		*  Preguntar al profe. Si existe clase hay que validarla como con load? Sino va a haber dos clases distintas en la base con mismo nombre
-		* 		Dijo "actualizar clase, borrar todas las instancias y volverlas a guardar"
-		* 		Con volverlas a guardar no se si se refiere a tener que volverlas a cargar por parte del usuario
-		* 		o tenemos que "actualizarlas" nosotros, en este ultimo caso, que hacemos con las diferencias?
-		* 5. Obtener PersistentObject de "o" <- la clase pasada ya tiene que estar validada y con los ids correspondientes
-		* 6. Obtener objeto para esa clase y esa sesion
-		* 7. Existe objeto?
-		* 	7-1-a. Hacer update de ese objectId usando PersistentObject obtenido en 4
-		* 	7-1-b. Devolver true
-		* else
-		* 	7-2-a. Crear nuevo PersistentObject obtenido en 4
-		* 	7-2-b. Devolver false
-		*/
-		return false;
+		Session currentSession = getCurrentSession(sId);
+		Clazz currentClazz = null;
+		try {
+			currentClazz = getCurrentClazz(o);
+		} catch (StructureChangedException e) {
+			e.printStackTrace();
+			return false;
+		}
+		PersistableObject currentPersistableObject = getCurrentPersistableObject(currentClazz, currentSession);
+		PersistableObject updatedPersistableObject = new ObjectParser(objectFieldRepo).toPersistable(currentPersistableObject, o, currentClazz, currentSession);
+		persistableObjectRepo.save(updatedPersistableObject);
+		return true;
+	}
+
+	private PersistableObject getCurrentPersistableObject(Clazz clazz, Session session) {
+		Optional<PersistableObject> storedObject = Optional.empty(); //TODO: persistableObjectRepo.findByClassAndSession(clazzId, sessionId)
+		if (storedObject.isPresent()) {
+			return storedObject.get();
+		}
+		PersistableObject obj = new PersistableObject();
+		obj.setClazzId(clazz);
+		obj.setSessionId(session);
+		return obj;
+	}
+
+	private Session getCurrentSession(long sId) {
+		Optional<Session> storedSession = sessionRepo.findById(sId);
+		if (storedSession.isPresent()) {
+			Session s = storedSession.get();
+			Date date = new Date();
+			s.setLast_access(date.getTime());
+			return sessionRepo.save(s);
+		}
+		Session newSession = new Session();
+		Date date = new Date();
+		newSession.setLast_access(date.getTime());
+		newSession.setId(sId);
+		return sessionRepo.save(newSession);
+	}
+
+	private Clazz getCurrentClazz(Object obj) throws StructureChangedException {
+		Clazz clazz = ClazzParser.getInstance(fieldTypeRepo).toClazzFromObject(obj);
+		int exists = CompareClass.existsInDB(clazzRepo, clazz);
+		if (exists == 0) {
+			return clazzRepo.save(clazz);
+		} else if (exists == 1) {
+			return clazzRepo.findByName(clazz.getName());
+		}else {
+			Clazz existingClazz = clazzRepo.findByName(ClazzParser.getInstance().getName(clazz));
+			//TODO: persistableObjectRepo.deleteAllByClassId(existingClazz.getId());
+			//remover la clase
+			//TODO: clazzRepo.deleteByName(existingClazz.getName());
+			//guardar la clase nueva
+			return clazzRepo.save(clazz);
+		}
+
 	}
 
 	@Override

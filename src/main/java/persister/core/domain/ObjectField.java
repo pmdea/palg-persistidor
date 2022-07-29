@@ -37,6 +37,9 @@ public class ObjectField {
 	
 	@Column(name = "valor")
     private String valor;
+
+	@Column(name = "nestedObjectType")
+	private String nestedObjectFieldType;
     
     public ObjectField() {}
     
@@ -98,6 +101,13 @@ public class ObjectField {
 	public void setValue(String value) {
 		this.valor = value;
 	}
-    
-    
+
+
+	public String getNestedObjectFieldType() {
+		return nestedObjectFieldType;
+	}
+
+	public void setNestedObjectFieldType(String nestedObjectFieldType) {
+		this.nestedObjectFieldType = nestedObjectFieldType;
+	}
 }

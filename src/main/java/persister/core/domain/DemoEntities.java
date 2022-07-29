@@ -9,9 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 
-import org.aspectj.apache.bcel.classfile.ClassParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,8 +19,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import persister.ClazzParser;
-import persister.CompareClass;
+import persister.PersistentObject;
 import persister.PersonaTest;
 import persister.core.repository.ClazzRepository;
 import persister.core.repository.FieldRepository;
@@ -59,30 +56,20 @@ public class DemoEntities {
 		@Autowired
 		private PersistableObjectRepository persistableObjectRepo;
 		@Autowired
-		private SessionRepository sessionRepository;
+		private SessionRepository sessionRepo;
 
 		@RequestMapping("/test2")
 		public Object generarTest2() throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, ClassNotFoundException, InstantiationException, StructureChangedException {
 			PersonaTest objTest = new PersonaTest();
 			objTest.setDni(123123123);
 			objTest.setNombre("test");
+			List<String> amigos = new ArrayList<>();
+			amigos.add("jorge");
+			amigos.add("raul");
+			objTest.setAmigos(amigos);
 
-			Clazz clazz = getClazz(clazzRepo, objTest);
-
-			return clazz.getId();
-		}
-
-		private Clazz getClazz(ClazzRepository clazzRepo, Object obj) throws StructureChangedException {
-			Clazz clazz = ClazzParser.toClazzFromObject(obj);
-			int exists = CompareClass.existsInDB(clazzRepo, ClazzParser.toClazzFromObject(obj));
-			if (exists == 0) {
-				return clazzRepo.save(clazz);
-			} else if (exists == 1) {
-				String className = clazz.getName();
-				return clazzRepo.findByName(className);
-			} else {
-				throw new StructureChangedException(PersonaTest.class.getName() + " is different from the one in DB");
-			}
+			PersistentObject persistentObject = new PersistentObject(sessionRepo, clazzRepo, persistableObjectRepo, fieldTypeRepo, objectFieldRepo);
+			return persistentObject.store(1, objTest) && persistentObject.store(2, objTest);
 		}
 		
 		@RequestMapping("/test")
@@ -127,13 +114,13 @@ public class DemoEntities {
 				oField.setValue(valueObj.toString());
 				objectFields.add(oField);
 			}
-			pObject.setObjectFieldsParents(objectFields);
+			pObject.setObjectFields(objectFields);
 
 			ArrayList<PersistableObject> objects = new ArrayList<>();
 			objects.add(pObject);
 			session.setPersistableObject(objects);
 			session.setLast_access(Instant.now().getEpochSecond()); //Timestamp como long en segundos
-			sessionRepository.save(session);
+			sessionRepo.save(session);
 			return session;
 		}
 	}

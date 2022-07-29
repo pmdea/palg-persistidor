@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class Session {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    private long id;
     private long last_access;
     
     @OneToMany(mappedBy = "sessionId", cascade = CascadeType.ALL)
@@ -37,11 +37,11 @@ public class Session {
 		this.persistableObjectList = persistableObject;
 	}
 
-	public int getId() {
+	public long getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

@@ -1,13 +1,17 @@
 package persister;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import persister.annotations.NotPersistable;
 import persister.annotations.Persistable;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
@@ -33,9 +37,12 @@ public class Application {
             Boolean persistField = (persistable != null || persistableField != null) && notPersistableField == null;
             System.out.println("\t\tPersistable: "+ persistField);
             try {
+                ObjectMapper mapper = new ObjectMapper();
+                String v = mapper.writeValueAsString(field.get(p));
+                List list = mapper.readValue(v, List.class);
                 field.setAccessible(true);
-                System.out.println("\t\tValor: " + field.get(p));
-            } catch (IllegalAccessException e) {
+                System.out.println("\t\tValor: " + field.get(v));
+            } catch (IllegalAccessException | IOException e) {
                 e.printStackTrace();
             }
         });

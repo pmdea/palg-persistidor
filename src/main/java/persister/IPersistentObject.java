@@ -9,7 +9,7 @@ public interface IPersistentObject {
 	// segun actualiza o almacena.
 	// El objeto o puede ser null, en tal caso el valor que se
 	// almacenara sera null.
-	public boolean store(long sId, Object o);
+	public boolean store(long sId, Object o) throws StructureChangedException;
 	
 	// Devuelve la instancia del objeto o asociada a la clave sId.
 	public <T> T load(long sId, Class<T> clazz) throws StructureChangedException;

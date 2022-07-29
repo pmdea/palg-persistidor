@@ -66,9 +66,6 @@ public class PersistableObject {
 	}
 
 	public void setObjectFields(List<ObjectField> objectFields) {
-		this.objectFields = objectFields;
-	}
-	public void setObjectFieldsParents(List<ObjectField> objectFields) {
 		for (ObjectField objectField : objectFields) {
 			objectField.setObjectId(this);
 		}

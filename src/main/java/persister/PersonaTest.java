@@ -3,11 +3,20 @@ package persister;
 import persister.annotations.NotPersistable;
 import persister.annotations.Persistable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class PersonaTest {
     @Persistable
     private int dni;
     @NotPersistable
     private String nombre;
+    @Persistable
+    private List<String> amigos;
+
+    public PersonaTest() {
+        this.amigos = new ArrayList<>();
+    }
 
     public int getDni()
     {
@@ -27,4 +36,11 @@ public class PersonaTest {
     }
 
 
+    public List<String> getAmigos() {
+        return amigos;
+    }
+
+    public void setAmigos(List<String> amigos) {
+        this.amigos = amigos;
+    }
 }
