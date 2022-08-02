@@ -12,13 +12,41 @@ public class PersonaTest {
     @NotPersistable
     private String nombre;
     @Persistable
+    private String apellido;
+    
+    @Persistable
+    private List<Direccion> direcciones;
+    
+    @Persistable
     private List<String> amigos;
+    
+    
 
     public PersonaTest() {
         this.amigos = new ArrayList<>();
     }
+    
+    
 
-    public int getDni()
+    public String getApellido() {
+		return apellido;
+	}
+    
+	public void setApellido(String apellido) {
+		this.apellido = apellido;
+	}
+
+	public List<Direccion> getDirecciones() {
+		return direcciones;
+	}
+	
+	public void setDirecciones(List<Direccion> direcciones) {
+		this.direcciones = direcciones;
+	}
+
+
+
+	public int getDni()
     {
         return dni;
     }

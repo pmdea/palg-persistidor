@@ -51,7 +51,7 @@ public class ClazzParser {
             Annotation notPersistableField = field.getAnnotation(NotPersistable.class);
             boolean persistField = (persistable != null || persistableField != null) && notPersistableField == null;
             if (!persistField) return null;
-            FieldType type = getFieldType(field.getType().getName());
+            FieldType type = getFieldType(field.getType().getName(), field.getType().isPrimitive());
             Field f = new Field();
             f.setName(field.getName());
             f.setType(type);
@@ -73,13 +73,14 @@ public class ClazzParser {
         return clazz.getName();
     }
 
-    private FieldType getFieldType(String name) {
+    private FieldType getFieldType(String name, boolean primitivo) {
         Optional<FieldType> type = fieldTypeRepo.findByName(name);
         if (type.isPresent()) {
             return type.get();
         }
         FieldType newFieldType = new FieldType();
         newFieldType.setName(name);
+        newFieldType.setPrimitivo(primitivo);
         return fieldTypeRepo.save(newFieldType);
     }
 }

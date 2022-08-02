@@ -1,7 +1,10 @@
 package persister;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +28,16 @@ public class PersistentObject implements IPersistentObject{
 	private PersistableObjectRepository persistableObjectRepo;
 	private FieldTypeRepository fieldTypeRepo;
 	private ObjectFieldRepository objectFieldRepo;
+	private FieldRepository fieldRepo;
 
-	public PersistentObject(SessionRepository sessionRepo, ClazzRepository clazzRepo, PersistableObjectRepository persistableObjectRepo, FieldTypeRepository fieldTypeRepo, ObjectFieldRepository objectFieldRepo) {
+	public PersistentObject(SessionRepository sessionRepo, ClazzRepository clazzRepo, PersistableObjectRepository persistableObjectRepo, 
+			FieldTypeRepository fieldTypeRepo, ObjectFieldRepository objectFieldRepo, FieldRepository fieldRepo) {
 		this.sessionRepo = sessionRepo;
 		this.clazzRepo = clazzRepo;
 		this.persistableObjectRepo = persistableObjectRepo;
 		this.fieldTypeRepo = fieldTypeRepo;
 		this.objectFieldRepo = objectFieldRepo;
+		this.fieldRepo = fieldRepo;
 	}
 
 	private Predicate<PersistableObject> isOfClass(String clazzName){
@@ -49,13 +55,13 @@ public class PersistentObject implements IPersistentObject{
 			return false;
 		}
 		PersistableObject currentPersistableObject = getCurrentPersistableObject(currentClazz, currentSession);
-		PersistableObject updatedPersistableObject = new ObjectParser(objectFieldRepo).toPersistable(currentPersistableObject, o, currentClazz, currentSession);
+		PersistableObject updatedPersistableObject = new ObjectParser(objectFieldRepo, fieldRepo).toPersistable(currentPersistableObject, o, currentClazz, currentSession);
 		persistableObjectRepo.save(updatedPersistableObject);
 		return true;
 	}
 
 	private PersistableObject getCurrentPersistableObject(Clazz clazz, Session session) {
-		Optional<PersistableObject> storedObject = Optional.empty(); //TODO: persistableObjectRepo.findByClassAndSession(clazzId, sessionId)
+		Optional<PersistableObject> storedObject = persistableObjectRepo.findByClazzId_IdAndSessionId_Id(clazz.getId(), session.getId());
 		if (storedObject.isPresent()) {
 			return storedObject.get();
 		}
@@ -89,9 +95,10 @@ public class PersistentObject implements IPersistentObject{
 			return clazzRepo.findByName(clazz.getName());
 		}else {
 			Clazz existingClazz = clazzRepo.findByName(ClazzParser.getInstance().getName(clazz));
-			//TODO: persistableObjectRepo.deleteAllByClassId(existingClazz.getId());
+			List<PersistableObject> objectsToDelete = persistableObjectRepo.findByClazzId(existingClazz.getId());
+			persistableObjectRepo.deleteAll(objectsToDelete); //Borro los objetos
 			//remover la clase
-			//TODO: clazzRepo.deleteByName(existingClazz.getName());
+			clazzRepo.deleteById(existingClazz.getId());
 			//guardar la clase nueva
 			return clazzRepo.save(clazz);
 		}
@@ -100,20 +107,6 @@ public class PersistentObject implements IPersistentObject{
 
 	@Override
 	public <T> T load(long sId, Class<T> clazz) throws StructureChangedException {
-		// TODO Auto-generated method stub
-		/*
-			0. Obtengo nombre de clase
-			1. Busco clase por nombre, existe?
-				1-1-a. Obtengo Clazz de clazz y comparo para ver si son iguales, si son distintas tiro error StrutureChangedException
-			else
-				1-2-a. No se puede hacer load porque no existe clase, por ende tampoco objeto <-- Ver que hacer
-			2. Existe objeto con esa clase y esa sesion?
-				2-1-a. Parseo de PersistentObject al tipo dado
-				2-1-b. Actualizo timestamp
-				2-1-c. Retorno objeto
-			else
-				2-2-a. Objeto no encontrado
-		 */
 		String className = clazz.getName();
 		Optional<Session> sessionOpt = sessionRepo.findById(sId);
 		if(sessionOpt.isPresent()) {
@@ -123,43 +116,100 @@ public class PersistentObject implements IPersistentObject{
 			if(objectsFromSession.isEmpty())
 				return null; //no tiene objeto, return null
 			PersistableObject obj = objectsFromSession.get(0);
-			if(hasStructureChanged(clazz, obj.getClazzId()))
+			T object;
+			try {
+				//Obtengo el HEADER - fila que indica la cabeza del objeto
+				ObjectField header = obj.getObjectFields().get(0);
+				object = rebuildObject(clazz, header);
+			} catch (Exception e) {
 				throw new StructureChangedException("Structure of class " + clazz.getName() + "has changed.");
-			T object = rebuildObject(clazz, obj);
+			}
 			session.setLast_access(Instant.now().getEpochSecond());
+			sessionRepo.save(session);
 			return object;
 		}
-		
-		
 		return null;
 	}
 	
-	private <T> T rebuildObject(Class<T> c, PersistableObject obj) {
-		T recon = null;
-		try {
-			recon = c.newInstance();
-			for(Field f : c.getDeclaredFields()) {
-				f.setAccessible(true);
-				ObjectField objField = obj.getObjectFields().stream().filter(field -> field.getFieldId().getName().equals(f.getName())).collect(Collectors.toList()).get(0);
-				
+	private <T> T rebuildObject(Class<T> c, ObjectField obj) throws Exception {
+		//Obtengo la clase
+		String className = c.getName();
+		//Obtengo los atributos
+		Field[] atributos = c.getDeclaredFields();
+		//Hago una instancia de la clase
+		T objeto = (T)Class.forName(className).newInstance();
+		//Busco si tiene hijos
+		List<ObjectField> childFields = objectFieldRepo.findByParentId(obj.getId());
+		
+		for(Field prop : atributos) {
+			prop.setAccessible(true);
+			String propName = prop.getName();
+			Optional<ObjectField> optAtr = childFields.stream().filter(atributo -> atributo.getFieldId().getName().equals(propName)).findFirst();
+			if(!optAtr.isPresent())
+				continue;
+			ObjectField atr = optAtr.get();
+			if(Types.getInstance().isPrimitive(atr.getNombre())){ // no tiene hijos
+				setObject(prop, atr.getValue(), objeto);
 			}
+			else {
+
+				List<ObjectField> elementos = objectFieldRepo.findByParentId(atr.getId());
+
+				Class clase = prop.getType();
+				if (Types.getInstance().isObject(prop)){ // El hijo es un objeto
+					prop.set(objeto, rebuildObject(clase, atr));
+				}
+				else if(Types.getInstance().isListObject(prop)) { //El hijo es lista de objetos
+					List<T> listaObjetos = new ArrayList<T>();
+					ParameterizedType listType = (ParameterizedType)prop.getGenericType();
+			        Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
+					for(ObjectField e : elementos) {
+						listaObjetos.add((T) rebuildObject(listClass, e));
+					}
+					prop.set(objeto, listaObjetos);
+				}
+				else if(Types.getInstance().isListPrimitive(prop)) { //El hijo es lista de primitivos
+					List<T> listaObjetos = new ArrayList<T>();
+					for(ObjectField e : elementos) {
+						T type = (T) e.getValue();
+						listaObjetos.add(type);
+					}
+					prop.set(objeto, listaObjetos);
+				}
+			}
+		}
+		
+		return objeto;
+	}
+	
+	private <T> void setObject(Field prop, String valueparam, T objeto) throws NumberFormatException, IllegalArgumentException, IllegalAccessException{
+		switch (prop.getType().toString()) {
+		case "int":
+			prop.setInt(objeto, Integer.parseInt(valueparam));
+			break;
+		case "double":
+			prop.setDouble(objeto, Double.parseDouble(valueparam));
+			break;
+		case "boolean":
+			prop.setBoolean(objeto, Boolean.parseBoolean(valueparam));
 			
-		} catch (InstantiationException e) {} catch (IllegalAccessException e) {}
-		
-		return recon;
-	}
-	
-	private boolean hasStructureChanged(Class classJ, Clazz classDb) {
-		
-		return false;
-	}
-	
-	private boolean isPrimitive(Object obj) {
-		return obj.getClass().isPrimitive()
-				|| obj instanceof String
-                || obj instanceof Integer
-                || obj instanceof Double
-                || obj instanceof Boolean;
+			break;
+		case "char":
+			prop.setChar(objeto, valueparam.charAt(0));
+			
+			break;
+		case "float":
+			prop.setFloat(objeto, Float.parseFloat(valueparam));
+			
+			break;
+		case "long":
+			prop.setLong(objeto, Long.parseLong(valueparam));
+			break;
+
+		default:
+			prop.set(objeto, valueparam);
+			break;
+		}
 	}
 
 	@Override
@@ -168,7 +218,6 @@ public class PersistentObject implements IPersistentObject{
 		Optional<Session> session = sessionRepo.findById(sId);
 		if(session.isPresent()) {
 			Session actual = session.get();
-			actual.setLast_access(Instant.now().getEpochSecond());
 			return !findObjectByClassName(actual
 					.getPersistableObject(), clazz.getName())
 					.isEmpty();
@@ -188,23 +237,18 @@ public class PersistentObject implements IPersistentObject{
 		Optional<Session> session = sessionRepo.findById(sId);
 		if(session.isPresent())
 			return Instant.now().getEpochSecond() - session.get().getLast_access();
-		return -1; //Si no existe la sesion
+		return -1;
 	}
 
 	@Override
 	public <T> T delete(long sId, Class<T> clazz) {
-		/*
-			Llamar a load y catchear errores
-			Si hay errores de clase corrupta o no existe objeto, que hacer?
-			Si no hay error, buscar clase por nombre para obtener ID y eliminar el Persisted Object segun sId y classId
-			Se puede hacer una funcion auxiliar que devuelva el objeto ya parseado y el classId, para reutilizar logica entre delete y store.
-			Tambien puede tener un booleano si busca eliminar o leer
-		 */
 		T deletedObject = null;
 		try {
 			deletedObject = load(sId, clazz);
 			if(sessionRepo.findById(sId).isPresent()) {
 				Session session = sessionRepo.findById(sId).get();
+				List<PersistableObject> objectsFromSession = findObjectByClassName(session.getPersistableObject(), clazz.getName()); //Verifico que tenga un objeto con la class
+				persistableObjectRepo.delete(objectsFromSession.get(0));
 				session.getPersistableObject().removeIf(isOfClass(clazz.getName()));
 				session.setLast_access(Instant.now().getEpochSecond());
 				sessionRepo.save(session);

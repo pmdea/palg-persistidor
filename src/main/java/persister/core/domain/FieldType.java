@@ -14,29 +14,34 @@ public class FieldType {
 	@GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String name;
-
-    public FieldType(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+    private boolean primitivo;
     
     public FieldType() {}
-
+	public FieldType(int id, String name, boolean primitivo) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.primitivo = primitivo;
+	}
 	public int getId() {
 		return id;
 	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
-
 	public String getName() {
 		return name;
 	}
-
 	public void setName(String name) {
 		this.name = name;
 	}
+	public boolean isPrimitivo() {
+		return primitivo;
+	}
+	public void setPrimitivo(boolean primitivo) {
+		this.primitivo = primitivo;
+	}
+    
     
     
 }

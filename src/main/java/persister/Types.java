@@ -1,6 +1,9 @@
 package persister;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class Types {
@@ -33,11 +36,30 @@ public class Types {
         return instance;
     }
 
+    public boolean isPrimitive(Field type) {
+        return primitives.contains(type.getType().getName());
+    }
+    
+
     public boolean isPrimitive(String type) {
         return primitives.contains(type);
     }
+    
+    public boolean isObject(Field type) {
+    	return !Collection.class.isAssignableFrom(type.getType()) && type.toString().contains("java");
+    }
 
-    public boolean isList(String type) {
-        return lists.contains(type);
+    public boolean isListPrimitive(Field type) {
+		ParameterizedType listType = (ParameterizedType)type.getGenericType();
+        Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
+        boolean primitive = listClass.isPrimitive() || listClass.getName().equals("java.lang.String");
+        return Collection.class.isAssignableFrom(type.getType()) && primitive;
+    }
+    
+    public boolean isListObject(Field type) {
+		ParameterizedType listType = (ParameterizedType)type.getGenericType();
+        Class<?> listClass = (Class<?>) listType.getActualTypeArguments()[0];
+        boolean primitive = listClass.isPrimitive() || listClass.getName().equals("java.lang.String");
+        return Collection.class.isAssignableFrom(type.getType()) && !primitive;
     }
 }
